@@ -20,7 +20,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +54,7 @@ public class KafkaConfig {
         configProperties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         configProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        //configProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "transactionalId");
         DefaultKafkaProducerFactory<String, String> producerFactory = new DefaultKafkaProducerFactory<>(configProperties);
         producerFactory.setTransactionIdPrefix("spring-kafka-transaction");
         return producerFactory;
@@ -79,6 +79,7 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory("kafka-txn-test"));
+        factory.getContainerProperties().setTransactionManager(kafkaTransactionManager());
         return factory;
     }
 
@@ -93,8 +94,8 @@ public class KafkaConfig {
 
 
     @Bean
-    public JpaTransactionManager jpaTransactionManager(EntityManagerFactory em) {
-        return new JpaTransactionManager(em);
+    public JpaTransactionManager jpaTransactionManager() {
+        return new JpaTransactionManager();
     }
 
     @Bean(name = "transactionManager")
@@ -103,4 +104,8 @@ public class KafkaConfig {
         return new ChainedTransactionManager(jpaTransactionManager, kafkaTransactionManager);
     }
 
+//    @Bean(name = "transactionManager")
+//    public ChainedTransactionManager chainedTxM(JpaTransactionManager jpa, KafkaTransactionManager<?, ?> kafka) {
+//        return new ChainedTransactionManager(jpa, kafka);
+//    }
 }
