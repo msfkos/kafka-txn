@@ -1,0 +1,30 @@
+spring:
+  kafka.producer.transaction-id-prefix: kfktxId
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost/test_data
+    username: root
+    password:
+    tomcat:
+      test-while-idle: true
+      validation-query: SELECT 1
+      maximum-pool-size: 5
+      time-between-eviction-runs-millis: 1000
+      test-on-borrow: true
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  jackson:
+    property-naming-strategy : SNAKE_CASE
+
+
+kafka:
+  bootstrap.servers: 127.0.0.1:9092
+  async:
+    max.pool: 10
+    core.pool: 10
