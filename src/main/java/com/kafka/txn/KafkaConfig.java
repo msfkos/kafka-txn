@@ -14,9 +14,11 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.transaction.ChainedKafkaTransactionManager;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
@@ -101,7 +103,7 @@ public class KafkaConfig {
     @Bean(name = "transactionManager")
     public ChainedTransactionManager chainedTransactionManager(JpaTransactionManager jpaTransactionManager,
                                                                KafkaTransactionManager kafkaTransactionManager) {
-        return new ChainedTransactionManager(jpaTransactionManager, kafkaTransactionManager);
+        return new ChainedKafkaTransactionManager(kafkaTransactionManager, jpaTransactionManager);
     }
 
 //    @Bean(name = "transactionManager")
